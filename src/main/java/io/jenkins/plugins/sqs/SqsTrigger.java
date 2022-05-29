@@ -23,11 +23,14 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static lombok.AccessLevel.PACKAGE;
 
 @Log
 public class SqsTrigger extends Trigger<Job<?, ?>> {
@@ -113,6 +116,7 @@ public class SqsTrigger extends Trigger<Job<?, ?>> {
             return "AWS SQS Trigger";
         }
 
+        @Setter(PACKAGE)
         private transient SqsPoller sqsPoller;
 
         public ListBoxModel doFillSqsTriggerCredentialsIdItems(@AncestorInPath Item item) {
@@ -128,7 +132,12 @@ public class SqsTrigger extends Trigger<Job<?, ?>> {
                                     AmazonWebServicesCredentials.class));// (4)
         }
 
+        @POST
         public FormValidation doCheckSqsTriggerQueueUrl(@AncestorInPath Item item, @QueryParameter String sqsTriggerQueueUrl) {
+            if (item == null) { // no context
+                return FormValidation.error("Must have an ancestor item");
+            }
+            item.checkPermission(Item.CONFIGURE);
             if (StringUtils.isEmpty(sqsTriggerQueueUrl)) {
                 return FormValidation.error("Queue Url is Empty");
             } else {
@@ -136,29 +145,43 @@ public class SqsTrigger extends Trigger<Job<?, ?>> {
             }
         }
 
-        public FormValidation doCheckSqsTriggerCredentialsId(@AncestorInPath Item item) {
-            if (item == null) {
-                if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
-                    return FormValidation.ok(); // (3)
-                }
-            } else {
-                if (!item.hasPermission(Item.EXTENDED_READ)
-                        && !item.hasPermission(CredentialsProvider.USE_ITEM)) {
-                    return FormValidation.ok(); // (3)
-                }
+        @POST
+        public FormValidation doCheckSqsTriggerCredentialsId(@AncestorInPath Item item, @QueryParameter String value) {
+            if (item == null) { // no context
+                return FormValidation.error("Must have an ancestor item");
+            }
+            if (StringUtils.isBlank(value)) { // (4)
+                return FormValidation.ok(); // (4)
+            }
+            if (CredentialsProvider.listCredentials( // (6)
+                    AmazonWebServicesCredentials.class,
+                    Jenkins.get(),
+                    ACL.SYSTEM,
+                    Collections.emptyList(),
+                    CredentialsMatchers.withId(value) // (6)
+            ).isEmpty()) {
+                return FormValidation.error("Cannot find currently selected credentials");
             }
             return FormValidation.ok();
         }
 
-        public FormValidation doTestConnection(@QueryParameter("sqsTriggerQueueUrl") final String queueUrl,
+        @POST
+        public FormValidation doTestConnection(@AncestorInPath Item item, @QueryParameter("sqsTriggerQueueUrl") final String queueUrl,
                                                @QueryParameter("sqsTriggerCredentialsId") final String credentialsId) {
             try {
+                if (item == null) { // no context
+                    return FormValidation.error("Must have an ancestor item");
+                }
+                if (StringUtils.isBlank(queueUrl)) {
+                    return FormValidation.error("Queue Url is Empty");
+                }
+                item.checkPermission(Item.CONFIGURE);
                 AWSCredentials awsCredentials = AwsCredentialsHelper.getAWSCredentials((credentialsId));
                 initService();
                 sqsPoller.testConnection(queueUrl, awsCredentials);
                 return FormValidation.ok("Success");
             } catch (Exception e) {
-                return FormValidation.error("Error  : " + e.getMessage());
+                return FormValidation.error("Error :" + e.getMessage());
             }
         }
 

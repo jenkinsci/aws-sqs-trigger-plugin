@@ -53,7 +53,7 @@ public class SqsPollerImpl implements SqsPoller {
     }
 
     private void deleteMessages(String queueUrl, AmazonSQS sqs, List<Message> messages) {
-        log.fine(() -> "Start to delete SQS " + messages.size() + "message from " + queueUrl + ".");
+        log.fine(() -> "Start to delete SQS " + messages.size() + " message(s) from " + queueUrl + ".");
         List<DeleteMessageBatchRequestEntry> entries = messages.stream()
                 .map(message -> {
                     UUID uuid = UUID.randomUUID();
@@ -73,7 +73,7 @@ public class SqsPollerImpl implements SqsPoller {
                 .withMaxNumberOfMessages(10);
         ReceiveMessageResult messageResult = sqs.receiveMessage(receiveRequest);
         List<Message> messages = messageResult.getMessages();
-        log.fine(() -> messages.size() + " messages received from " + queueUrl + ".");
+        log.fine(() -> messages.size() + " message(s) received from " + queueUrl + ".");
         return messages;
     }
 
