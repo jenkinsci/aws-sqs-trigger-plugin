@@ -8,7 +8,7 @@
     <f:entry field="sqsTriggerCredentialsId" title="${%Credentials}">
         <c:select />
     </f:entry>
-    <f:entry field="skipIfLastBuildNotFinished" title="${%SkipIfLastBuildNotFinished}">
+    <f:entry field="sqsSkipIfLastBuildNotFinished" title="${%SkipIfLastBuildNotFinished}">
         <f:checkbox />
     </f:entry>
     <f:block>

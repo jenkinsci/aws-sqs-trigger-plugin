@@ -15,6 +15,8 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.java.Log;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.AncestorInPath;
@@ -29,9 +31,18 @@ import java.util.stream.Collectors;
 
 @Log
 public class SqsTrigger extends Trigger<Job<?, ?>> {
+    @DataBoundSetter
+    @Getter
+    @Setter
     private String sqsTriggerQueueUrl;
+    @DataBoundSetter
+    @Getter
+    @Setter
     private String sqsTriggerCredentialsId;
-    private boolean skipIfLastBuildNotFinished;
+    @DataBoundSetter
+    @Getter
+    @Setter
+    private boolean sqsSkipIfLastBuildNotFinished;
 
     @Override
     public void start(Job project, boolean newInstance) {
@@ -47,9 +58,9 @@ public class SqsTrigger extends Trigger<Job<?, ?>> {
 
     public  void buildJob(List<Message> messages) {
         log.fine(()->"receive " +messages.size() +" messages");
-        log.fine(()->"skipIfLastBuildNotFinished is " + skipIfLastBuildNotFinished);
+        log.fine(()->"skipIfLastBuildNotFinished is " + sqsSkipIfLastBuildNotFinished);
         if (job != null && messages.size()>0) {
-            if (skipIfLastBuildNotFinished ){
+            if (sqsSkipIfLastBuildNotFinished){
                 Run<?, ?> lastBuild = job.getLastBuild();
                 boolean isLastStillRunning = Optional.ofNullable(lastBuild)
                         .map(Run::isBuilding)
@@ -87,28 +98,6 @@ public class SqsTrigger extends Trigger<Job<?, ?>> {
     public SqsTrigger() {
     }
 
-    public String getSqsTriggerQueueUrl() {
-        return sqsTriggerQueueUrl;
-    }
-
-    @DataBoundSetter
-    public void setSqsTriggerQueueUrl(String sqsTriggerQueueUrl) {
-        this.sqsTriggerQueueUrl = sqsTriggerQueueUrl;
-    }
-
-    public String getSqsTriggerCredentialsId() {
-        return sqsTriggerCredentialsId;
-    }
-
-    @DataBoundSetter
-    public void setSqsTriggerCredentialsId(String sqsTriggerCredentialsId) {
-        this.sqsTriggerCredentialsId = sqsTriggerCredentialsId;
-    }
-
-    @DataBoundSetter
-    public void setSkipIfLastBuildNotFinished(boolean skipIfLastBuildNotFinished) {
-        this.skipIfLastBuildNotFinished = skipIfLastBuildNotFinished;
-    }
 
     public String getJobFullName(){
         return Optional.ofNullable(job).map(Job::getFullName).orElse("");
