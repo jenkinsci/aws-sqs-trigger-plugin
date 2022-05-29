@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:c="/lib/credentials">
+
+    <f:entry field="sqsTriggerQueueUrl" title="${%QueueUrl}">
+        <f:textbox/>
+    </f:entry>
+    <f:entry field="sqsTriggerCredentialsId" title="${%Credentials}">
+        <c:select />
+    </f:entry>
+    <f:entry field="skipIfLastBuildNotFinished" title="${%SkipIfLastBuildNotFinished}">
+        <f:checkbox />
+    </f:entry>
+    <f:block>
+        <f:validateButton method="testConnection" title="${%Test}" with="sqsTriggerQueueUrl,sqsTriggerCredentialsId"/>
+    </f:block>
+</j:jelly>
