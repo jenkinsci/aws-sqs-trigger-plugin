@@ -4,6 +4,7 @@ import lombok.extern.java.Log;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 @Log
 public class AllTriggers {
 
@@ -15,12 +16,12 @@ public class AllTriggers {
     private List<SqsTrigger> triggerList = new CopyOnWriteArrayList();
 
     public void add(SqsTrigger trigger) {
-        log.fine(()-> "Add SQS trigger, url: "+ trigger.getSqsTriggerQueueUrl()+ " job: " + trigger.getJobFullName() );
+        log.fine(() -> "Add SQS trigger, url: " + trigger.getSqsTriggerQueueUrl() + " job: " + trigger.getJobFullName() + ".");
         triggerList.add(trigger);
     }
 
     public void remove(SqsTrigger trigger) {
-        log.fine(()-> "Remove SQS trigger, url: "+ trigger.getSqsTriggerQueueUrl()+ " job: " + trigger.getJobFullName() );
+        log.fine(() -> "Remove SQS trigger, url: " + trigger.getSqsTriggerQueueUrl() + " job: " + trigger.getJobFullName() + ".");
         triggerList.remove(trigger);
     }
 

@@ -46,14 +46,14 @@ public class SqsPollerImpl implements SqsPoller {
             return messages;
         } catch (Exception e) {
             log.log(Level.WARNING, e, () ->
-                    "Error to retrieve messages from " + queueUrl
+                    "Error to retrieve messages from " + queueUrl + "."
             );
             return Collections.emptyList();
         }
     }
 
     private void deleteMessages(String queueUrl, AmazonSQS sqs, List<Message> messages) {
-        log.fine(() -> "Start to delete SQS " + messages.size() + "message from " + queueUrl);
+        log.fine(() -> "Start to delete SQS " + messages.size() + "message from " + queueUrl + ".");
         List<DeleteMessageBatchRequestEntry> entries = messages.stream()
                 .map(message -> {
                     UUID uuid = UUID.randomUUID();
@@ -61,18 +61,19 @@ public class SqsPollerImpl implements SqsPoller {
                 })
                 .collect(Collectors.toList());
         sqs.deleteMessageBatch(queueUrl, entries);
-        log.fine(() -> "Message deleted from " + queueUrl);
+        log.fine(() -> "Message deleted from " + queueUrl + ".");
     }
 
     private List<Message> receiveMessages(String queueUrl, AmazonSQS sqs, int waitTimeSeconds) {
 
-        log.fine(() -> "Start to receive SQS message from " + queueUrl + " with waitTimeSeconds " + waitTimeSeconds);
+        log.fine(() -> "Start to receive SQS message from " + queueUrl + " with waitTimeSeconds " + waitTimeSeconds + ".");
         ReceiveMessageRequest receiveRequest = new ReceiveMessageRequest()
                 .withQueueUrl(queueUrl)
-                .withWaitTimeSeconds(waitTimeSeconds);
+                .withWaitTimeSeconds(waitTimeSeconds)
+                .withMaxNumberOfMessages(10);
         ReceiveMessageResult messageResult = sqs.receiveMessage(receiveRequest);
         List<Message> messages = messageResult.getMessages();
-        log.fine(() -> messages.size() + " messages received from " + queueUrl);
+        log.fine(() -> messages.size() + " messages received from " + queueUrl + ".");
         return messages;
     }
 
@@ -80,13 +81,13 @@ public class SqsPollerImpl implements SqsPoller {
     private AmazonSQS createSQSClient(String queueUrl, AWSCredentials awsCredentials) {
         AWSCredentialsProvider credentialsProvider;
 
-        log.finest(() -> "Guess region from " + queueUrl);
+        log.finest(() -> "Guess region from " + queueUrl + ".");
         String sqsFQDN = new URL(queueUrl).getHost();
         String region = sqsFQDN.split("\\.")[1];
-        log.finest(() -> "Use " + region);
+        log.finest(() -> "Use " + region + ".");
 
         if (awsCredentials != null) {
-            log.finest(() -> "Use the AWS credentials " + awsCredentials.getAWSAccessKeyId());
+            log.finest(() -> "Use the AWS credentials " + awsCredentials.getAWSAccessKeyId() + ".");
             credentialsProvider = new AWSCredentialsProvider() {
                 @Override
                 public AWSCredentials getCredentials() {
@@ -98,7 +99,7 @@ public class SqsPollerImpl implements SqsPoller {
                 }
             };
         } else {
-            log.finest(() -> "Use default credentials chain");
+            log.finest(() -> "Use default credentials chain.");
             credentialsProvider = new DefaultAWSCredentialsProviderChain();
         }
 
@@ -108,7 +109,7 @@ public class SqsPollerImpl implements SqsPoller {
         Optional.ofNullable(jenkins)
                 .map(Jenkins::getProxy)
                 .ifPresent(proxyConfiguration -> {
-                    log.finest(() -> "Use Jenkins Proxy");
+                    log.finest(() -> "Use Jenkins Proxy.");
                     clientConfiguration.setProxyHost(proxyConfiguration.getName());
                     clientConfiguration.setProxyPort(proxyConfiguration.getPort());
                     clientConfiguration.setNonProxyHosts(proxyConfiguration.getNoProxyHost());

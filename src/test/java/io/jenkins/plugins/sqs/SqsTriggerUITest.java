@@ -50,7 +50,7 @@ public class SqsTriggerUITest {
             queueNameInput.setText("some-aws-queue-url");
             HtmlSelect credentials = config.getSelectByName("_.sqsTriggerCredentialsId");
             credentials.setSelectedAttribute("aws", true);
-            HtmlCheckBoxInput skipIfLastBuildNotFinished = config.getInputByName("_.sqsSkipIfLastBuildNotFinished");
+            HtmlCheckBoxInput skipIfLastBuildNotFinished = config.getInputByName("_.sqsDisableConcurrentBuilds");
             skipIfLastBuildNotFinished.setChecked(true);
 
             r.submit(config);
@@ -66,7 +66,7 @@ public class SqsTriggerUITest {
             HtmlSelect credentials = config.getSelectByName("_.sqsTriggerCredentialsId");
             assertThat(credentials.getSelectedOptions().get(0).getValueAttribute()).isEqualTo("aws");
 
-            HtmlCheckBoxInput skipIfLastBuildNotFinished = config.getInputByName("_.sqsSkipIfLastBuildNotFinished");
+            HtmlCheckBoxInput skipIfLastBuildNotFinished = config.getInputByName("_.sqsDisableConcurrentBuilds");
             assertThat(skipIfLastBuildNotFinished.isChecked()).isTrue();
 
         });

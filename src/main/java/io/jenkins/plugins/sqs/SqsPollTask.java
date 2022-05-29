@@ -5,8 +5,6 @@ import com.amazonaws.services.sqs.model.Message;
 import hudson.Extension;
 import hudson.model.AsyncPeriodicWork;
 import hudson.model.TaskListener;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.java.Log;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
@@ -35,7 +33,7 @@ public class SqsPollTask extends AsyncPeriodicWork {
 
 
         List<SqsTrigger> triggers = AllTriggers.INSTANCE.getAll();
-        log.fine(()->"Find "+ triggers.size()+ " SQS triggers");
+        log.fine(() -> "Find " + triggers.size() + " SQS triggers.");
 
         initService();
 

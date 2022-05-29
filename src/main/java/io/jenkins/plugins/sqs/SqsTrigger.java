@@ -42,7 +42,7 @@ public class SqsTrigger extends Trigger<Job<?, ?>> {
     @DataBoundSetter
     @Getter
     @Setter
-    private boolean sqsSkipIfLastBuildNotFinished;
+    private boolean sqsDisableConcurrentBuilds;
 
     @Override
     public void start(Job project, boolean newInstance) {
@@ -56,31 +56,28 @@ public class SqsTrigger extends Trigger<Job<?, ?>> {
         super.stop();
     }
 
-    public  void buildJob(List<Message> messages) {
-        log.fine(()->"receive " +messages.size() +" messages");
-        log.fine(()->"skipIfLastBuildNotFinished is " + sqsSkipIfLastBuildNotFinished);
-        if (job != null && messages.size()>0) {
-            if (sqsSkipIfLastBuildNotFinished){
-                Run<?, ?> lastBuild = job.getLastBuild();
-                boolean isLastStillRunning = Optional.ofNullable(lastBuild)
-                        .map(Run::isBuilding)
-                        .orElse(false);
-                if ( isLastStillRunning) {
-                    log.fine("Last build "+lastBuild.getNumber()+ " is still running, skip this build");
+    public void buildJob(List<Message> messages) {
+        log.fine(() -> "Receive " + messages.size() + " messages.");
+
+        if (job != null && messages.size() > 0) {
+            if (sqsDisableConcurrentBuilds) {
+                log.fine(() -> "disableConcurrentBuilds is True.");
+                if (job.isBuilding()) {
+                    log.fine(() -> "Receive " + messages.size() + " messages. Ignore all because there's build running.");
                     return;
-                }else{
+                } else {
+                    log.fine(() -> "Receive " + messages.size() + " messages. Pick the first one and ignore others.");
                     Message message = messages.get(0);
-                    log.fine("Last build is finished or not existed");
                     buildOne(message);
                 }
-            }else{
-                messages.forEach(message->buildOne(message));
+            } else {
+                messages.forEach(message -> buildOne(message));
             }
         }
     }
 
     private void buildOne(Message message) {
-        log.fine(()->"build triggered by "+message.getMessageId());
+        log.fine(() -> "Build triggered by " + message.getMessageId() + ".");
         List<ParameterValue> parameters = message
                 .getMessageAttributes()
                 .entrySet()
@@ -99,7 +96,7 @@ public class SqsTrigger extends Trigger<Job<?, ?>> {
     }
 
 
-    public String getJobFullName(){
+    public String getJobFullName() {
         return Optional.ofNullable(job).map(Job::getFullName).orElse("");
     }
 

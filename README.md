@@ -2,23 +2,75 @@
 
 ## Introduction
 
-TODO Describe what your plugin does here
+This is a "simple" SQS trigger plugin to watch the AWS SQS queues.
+Once there are messages delivered to the watched SQS queues, the jobs are triggered by this plugin.  
 
 ## Getting started
+### Enable the trigger
+You need to create an SQS queue and grant the sqs:ReceiveMessage and sqs:DeleteMessage to the Jenkins instance.
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "sqs:DeleteMessage",
+                "sqs:ReceiveMessage"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
 
-TODO Tell users how to configure your plugin here, include screenshots, pipeline examples and 
-configuration-as-code examples.
+The queue must enable the [long polling](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html#sqs-long-polling)
+whose "Receive message wait time" is 20.
+This plugin support [AWS Credentials](https://plugins.jenkins.io/aws-credentials/) 
+or retrieve from environment variables, ec2 instance profile, EKS irsa.  
 
-## Issues
+Enable the trigger at job config page and input the SQS queue name to watch.
+Select the AWS credentials or leave the credentials filed blank to use the default credentials from environment variables, instance profile or EKS irsa.
+![trigger](doc/trigger.png)
 
-TODO Decide where you're going to host your issues, the default is Jenkins JIRA, but you can also enable GitHub issues,
-If you use GitHub issues there's no need for this section; else add the following line:
 
-Report issues and enhancements in the [Jenkins issue tracker](https://issues.jenkins-ci.org/).
+### Retrieve the message properties in the job
+SQS message properties are sent to the build by parameters. Because of the [SECURITY-170](https://support.cloudbees.com/hc/en-us/articles/223718807-SECURITY-170-Advisory),
+the job must explicitly define the parameters to used in the job. 
+All parameters are sent by this plugin as string parameters which starts with "sqs_".    
+| Parameter Name | Value  |
+| ------------- | ------------- |
+| sqs_body  | The message body  |
+| sqs_message_id  | The message id  |
+| sqs_\<MessageAttributeKey\>  | The message attributes string value |
+
+![parameters](doc/parameters.png)
+### Disable Concurrent Builds Triggered by Message(s)
+There are some use cases, for example a long time CD build to install a full application,
+which don't want to run builds concurrently.  
+Enable this option to prevent concurrently build triggered by the SMS messages.  
+When the option is checked and there's a running job whatever caused, build will be ignored when receive messages.
+When the option is checked and multiple messages are received,
+at most one build will be triggered if there's no running job.
+
+## Trigger multiple job from one queue messages
+This plugin deletes the messages immediately after receiving.
+So it's not possible to tigger multiple jobs from one queue by watch a single queue.
+To trigger multiple jobs, use an upstream job to watch and use [Build Step](https://www.jenkins.io/doc/pipeline/steps/pipeline-build-step/)
+to trigger a new build for a given job.
+
+## Why another SQS plugin?
+You can find several [SQS plugins](https://plugins.jenkins.io/ui/search?query=sqs). So why another one?  
+In my organization, we have many jenkins instance running in everywhere. Some are in AWS vpcs,
+and some are in on-premises data centers. We need to trigger a full CI/CD build stream to cross several Jenkins instances.  
+The most difference is that this plugin just watches the SQS queues without any other dependencies.  
+So we can simplify publish a message to AWS SNS by [AWS Steps plugin](https://plugins.jenkins.io/pipeline-aws/)  and trigger builds by this plugin.
+
 
 ## Contributing
 
-TODO review the default [CONTRIBUTING](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md) file and make sure it is appropriate for your plugin, if not then add your own one adapted from the base file
+[CONTRIBUTING](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md) 
 
 Refer to our [contribution guidelines](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md)
 
