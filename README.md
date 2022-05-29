@@ -67,6 +67,16 @@ and some are in on-premises data centers. We need to trigger a full CI/CD build 
 The most difference is that this plugin just watches the SQS queues without any other dependencies.  
 So we can simplify publish a message to AWS SNS by [AWS Steps plugin](https://plugins.jenkins.io/pipeline-aws/)  and trigger builds by this plugin.
 
+## AWS Cost
+This plugin calls aws SQS ReceiveMessage in 20s long polling per queue per minute. If there are messages received,
+it calls additional DeleteMessageBatch API. Suppose there's a message per 20 min, it calls around 45000 APIs per month.
+```
+(60+60/20)*24*30=45360
+```
+The data transfer out is charged also.  
+AWS gives free [First 1 Million Requests/Month](https://aws.amazon.com/sqs/pricing/).  
+If you choose to use Server Side Encryption by AWS Key Management Service (SSE-KMS),
+[additional cost](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-key-management.html#sqs-estimate-kms-usage-costs) is charged by KMS service.
 
 ## Contributing
 
