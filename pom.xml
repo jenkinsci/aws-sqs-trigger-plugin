@@ -48,7 +48,7 @@
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.249.x</artifactId>
+                <artifactId>bom-2.277.x</artifactId>
                 <version>950.v396cb834de1e</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -59,11 +59,6 @@
                 <version>${aws-java-sdk.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.dataformat</groupId>
-                <artifactId>jackson-dataformat-cbor</artifactId>
-                <version>2.13.2</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
