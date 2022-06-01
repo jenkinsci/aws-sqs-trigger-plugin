@@ -117,7 +117,7 @@ public class SqsTrigger extends Trigger<Job<?, ?>> {
         }
 
         @Setter(PACKAGE)
-        private transient SqsPoller sqsPoller;
+        private transient SqsPoller sqsPoller = new SqsPollerImpl();
 
         public ListBoxModel doFillSqsTriggerCredentialsIdItems(@AncestorInPath Item item) {
             StandardListBoxModel result = new StandardListBoxModel();
@@ -177,7 +177,6 @@ public class SqsTrigger extends Trigger<Job<?, ?>> {
                 }
                 item.checkPermission(Item.CONFIGURE);
                 AWSCredentials awsCredentials = AwsCredentialsHelper.getAWSCredentials((credentialsId));
-                initService();
                 sqsPoller.testConnection(queueUrl, awsCredentials);
                 return FormValidation.ok("Success");
             } catch (Exception e) {
@@ -185,11 +184,7 @@ public class SqsTrigger extends Trigger<Job<?, ?>> {
             }
         }
 
-        private void initService() {
-            if (sqsPoller == null) {
-                sqsPoller = new SqsPollerImpl();
-            }
-        }
+
     }
 
 

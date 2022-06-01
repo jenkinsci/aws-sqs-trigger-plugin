@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class SqsPollTask extends AsyncPeriodicWork {
 
 
-    private transient SqsPoller sqsPoller;
+    private transient SqsPoller sqsPoller  = new SqsPollerImpl();
 
     public SqsPollTask() {
         super("sqsPollTask");
@@ -34,8 +34,6 @@ public class SqsPollTask extends AsyncPeriodicWork {
 
         List<SqsTrigger> triggers = AllTriggers.INSTANCE.getAll();
         log.fine(() -> "Find " + triggers.size() + " SQS triggers.");
-
-        initService();
 
         triggers.stream()
                 .parallel()
@@ -51,12 +49,6 @@ public class SqsPollTask extends AsyncPeriodicWork {
 
     public void setSqsPoller(SqsPoller sqsPoller) {
         this.sqsPoller = sqsPoller;
-    }
-
-    private void initService() {
-        if (sqsPoller == null) {
-            sqsPoller = new SqsPollerImpl();
-        }
     }
 
     @Override
