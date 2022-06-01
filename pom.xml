@@ -13,6 +13,7 @@
     <packaging>hpi</packaging>
     <name>AWS SQS trigger Plugin</name>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+    <description>A Jenkins Plugin Triggers Builds by AWS SQS Messages</description>
     <licenses>
         <license>
             <name>MIT License</name>
