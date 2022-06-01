@@ -9,7 +9,7 @@
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>aws-sqs-trigger</artifactId>
-    <version>${revision}${changelist}</version>
+    <version>1.1</version>
     <packaging>hpi</packaging>
     <name>AWS SQS trigger Plugin</name>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
@@ -32,7 +32,7 @@
     <scm>
         <connection>scm:git:git://github.com/${gitHubRepo}</connection>
         <developerConnection>scm:git:git@github.com:${gitHubRepo}</developerConnection>
-        <tag>aws-sqs-trigger-1.0</tag>
+        <tag>aws-sqs-trigger-1.1</tag>
         <url>https://github.com/${gitHubRepo}</url>
     </scm>
     <properties>
