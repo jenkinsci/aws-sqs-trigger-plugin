@@ -11,7 +11,7 @@
     <artifactId>aws-sqs-trigger</artifactId>
     <version>${revision}${changelist}</version>
     <packaging>hpi</packaging>
-    <name>AWS SQS trigger Plugin</name>
+    <name>AWS SQS Trigger Plugin</name>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     <description>A Jenkins Plugin Triggers Builds by AWS SQS Messages</description>
     <licenses>
