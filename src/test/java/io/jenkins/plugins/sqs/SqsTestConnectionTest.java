@@ -5,7 +5,7 @@ import com.cloudbees.jenkins.plugins.awscredentials.AWSCredentialsImpl;
 import com.cloudbees.jenkins.plugins.awscredentials.AmazonWebServicesCredentials;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
-import com.gargoylesoftware.htmlunit.html.*;
+import org.htmlunit.html.*;
 import hudson.model.FreeStyleProject;
 import jenkins.model.Jenkins;
 import org.junit.Before;
