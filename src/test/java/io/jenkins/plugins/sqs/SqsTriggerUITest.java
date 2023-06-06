@@ -4,10 +4,10 @@ import com.cloudbees.jenkins.plugins.awscredentials.AWSCredentialsImpl;
 import com.cloudbees.jenkins.plugins.awscredentials.AmazonWebServicesCredentials;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
-import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlSelect;
-import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
+import org.htmlunit.html.HtmlCheckBoxInput;
+import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlSelect;
+import org.htmlunit.html.HtmlTextInput;
 import hudson.model.FreeStyleProject;
 import org.junit.Before;
 import org.junit.Rule;
@@ -64,7 +64,7 @@ public class SqsTriggerUITest {
             assertThat(queueNameInput.getText()).isEqualTo("some-aws-queue-url");
 
             HtmlSelect credentials = config.getSelectByName("_.sqsTriggerCredentialsId");
-            assertThat(credentials.getSelectedOptions().get(0).getValueAttribute()).isEqualTo("aws");
+            assertThat(credentials.getSelectedOptions().get(0).getValue()).isEqualTo("aws");
 
             HtmlCheckBoxInput skipIfLastBuildNotFinished = config.getInputByName("_.sqsDisableConcurrentBuilds");
             assertThat(skipIfLastBuildNotFinished.isChecked()).isTrue();
