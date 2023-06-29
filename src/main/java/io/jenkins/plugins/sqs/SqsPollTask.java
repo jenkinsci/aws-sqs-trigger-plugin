@@ -39,8 +39,12 @@ public class SqsPollTask extends AsyncPeriodicWork {
                 .parallel()
                 .forEach(trigger -> {
                     String credentialsId = trigger.getSqsTriggerCredentialsId();
-                    AWSCredentials awsCredentials = AwsCredentialsHelper.getAWSCredentials((credentialsId));
-                    List<Message> messages = sqsPoller.getMessagesAndDelete(trigger.getSqsTriggerQueueUrl(), awsCredentials);
+                    if (credentialsId == null || credentialsId.isBlank()) {
+                        List<Message> messages = sqsPoller.getMessagesAndDelete(trigger.getSqsTriggerQueueUrl(), null);
+                    } else {
+                        AWSCredentials awsCredentials = AwsCredentialsHelper.getAWSCredentials((credentialsId));
+                        List<Message> messages = sqsPoller.getMessagesAndDelete(trigger.getSqsTriggerQueueUrl(), awsCredentials);
+                    }
                     trigger.buildJob(messages);
                 });
 
